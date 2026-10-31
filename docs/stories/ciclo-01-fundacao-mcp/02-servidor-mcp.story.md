@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Implementar o servidor MCP em Python, seu cliente HTTP de catálogo e as duas fe
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para isolar a integração de catálogo do futuro loop do agente. |
+| 2026-10-31 | Review | Implementadas as tools HTTP de catálogo em `mcp-server/app/main.py`, com validação Pydantic, normalização de respostas e timeout de 3 s; a integração externa ficou isolada neste serviço para que o futuro agente não consulte DummyJSON diretamente. |
