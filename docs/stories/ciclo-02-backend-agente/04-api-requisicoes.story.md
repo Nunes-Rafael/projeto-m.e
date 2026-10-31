@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -42,3 +42,4 @@ Implementar os endpoints, orquestração do agente, validação de teto por unid
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para fechar o fluxo persistente sem confiar cegamente na saída do agente. |
+| 2026-10-31 | Review | Implementados `POST` e `GET /requisicoes` com validação contra detalhes retornados pelo MCP, totais em Decimal e persistência em transação; o limite monetário brasileiro é normalizado antes da comparação. |
