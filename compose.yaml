@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-purchase_agent}
       POSTGRES_USER: ${POSTGRES_USER:-purchase_agent}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -16,7 +16,7 @@ services:
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://purchase_agent:change-me@postgres:5432/purchase_agent}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-purchase_agent}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-purchase_agent}
       MCP_SERVER_URL: ${MCP_SERVER_URL:-http://mcp-server:8001}
       AGENT_MODE: ${AGENT_MODE:-local}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
@@ -36,8 +36,6 @@ services:
 
   mcp-server:
     build: ./mcp-server
-    ports:
-      - "8001:8001"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
       interval: 5s

@@ -1,10 +1,21 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 import httpx
 from fastapi import FastAPI, HTTPException
+from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field, field_validator
 
-app = FastAPI(title="Catalog MCP Server")
+mcp = FastMCP("catalog")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    async with mcp.session_manager.run():
+        yield
+
+
+app = FastAPI(title="Catalog MCP Server", lifespan=lifespan)
 
 CATALOG_URL = "https://dummyjson.com/products"
 CATALOG_TIMEOUT_SECONDS = 3.0
@@ -71,8 +82,9 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.post("/tools/buscar_produtos")
-async def buscar_produtos(input: SearchProductsInput) -> dict[str, list[dict[str, Any]]]:
+@mcp.tool()
+async def buscar_produtos(termo: str) -> dict[str, list[dict[str, Any]]]:
+    input = SearchProductsInput(termo=termo)
     payload = await get_catalog("/search", {"q": input.termo})
     products = payload.get("products")
     if not isinstance(products, list) or not all(isinstance(product, dict) for product in products):
@@ -80,8 +92,9 @@ async def buscar_produtos(input: SearchProductsInput) -> dict[str, list[dict[str
     return {"produtos": [normalize_product(product) for product in products]}
 
 
-@app.post("/tools/detalhar_produto")
-async def detalhar_produto(input: ProductDetailsInput) -> dict[str, Any]:
+@mcp.tool()
+async def detalhar_produto(id: int) -> dict[str, Any]:
+    input = ProductDetailsInput(id=id)
     product = await get_catalog(f"/{input.id}")
     normalized = normalize_product(product)
     normalized.update(
@@ -91,3 +104,6 @@ async def detalhar_produto(input: ProductDetailsInput) -> dict[str, Any]:
         }
     )
     return normalized
+
+
+app.mount("/", mcp.streamable_http_app())
