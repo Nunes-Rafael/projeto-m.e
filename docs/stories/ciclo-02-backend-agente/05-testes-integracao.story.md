@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Cobrir sucesso, nenhum produto compatível, timeout/falha de catálogo, saída i
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para verificar o contrato HTTP e as garantias de transação. |
+| 2026-10-31 | Review | Criada suíte de integração do FastAPI com agente e MCP substituídos por fakes; ela valida criação, listagem, falhas de agente e catálogo, incluindo ausência de persistência quando a validação falha antes da transação. |
