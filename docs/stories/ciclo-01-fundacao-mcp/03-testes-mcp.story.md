@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Criar a suíte de testes do servidor MCP e os fixtures necessários. Cobrir resp
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para garantir a exigência de validação independente do LLM. |
+| 2026-10-31 | Review | Adicionada a suíte `mcp-server/tests/test_catalog_tools.py` com mocks assíncronos do catálogo para busca, detalhe, validação local e timeout; os testes exercitam o contrato HTTP sem rede ou chave de LLM. |
