@@ -1,0 +1,4 @@
+Case-FDE.pdf
+.env
+.env.*
+!.env.example
