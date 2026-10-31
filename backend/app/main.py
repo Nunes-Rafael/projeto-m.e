@@ -10,7 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app.agent import AgentConfigurationError, AgentError, get_purchase_agent
+from app.agent import AgentConfigurationError, AgentError, NoCompatibleProductError, get_purchase_agent
 from app.mcp_client import CatalogMcpClient, McpClientError
 
 
@@ -68,6 +68,19 @@ class ApiError(Exception):
         self.message = message
 
 
+class ExecutionCatalog:
+    def __init__(self, client: CatalogMcpClient) -> None:
+        self.client = client
+        self.searched_product_ids: set[int] = set()
+
+    async def call_tool(self, name: str, arguments: dict[str, Any]) -> Any:
+        result = await self.client.call_tool(name, arguments)
+        if name == "buscar_produtos":
+            products = _tool_json(result).get("produtos", [])
+            self.searched_product_ids.update(product["id"] for product in products if isinstance(product.get("id"), int))
+        return result
+
+
 @app.exception_handler(ApiError)
 async def api_error(_: Request, error: ApiError) -> JSONResponse:
     return JSONResponse(status_code=error.status_code, content={"erro": {"codigo": error.code, "mensagem": error.message}})
@@ -83,7 +96,7 @@ async def create_purchase_request(payload: PurchaseRequest) -> dict[str, Any]:
     pedido = payload.pedido.strip()
     if not pedido:
         raise ApiError(422, "invalid_request", "O pedido não pode estar vazio.")
-    catalog = CatalogMcpClient(os.environ["MCP_SERVER_URL"])
+    catalog = ExecutionCatalog(CatalogMcpClient(os.environ["MCP_SERVER_URL"]))
     try:
         decision = await get_purchase_agent().decide(pedido, catalog)
         items = await _validate_items(decision.itens, catalog, _price_limit(pedido))
@@ -91,6 +104,8 @@ async def create_purchase_request(payload: PurchaseRequest) -> dict[str, Any]:
         raise ApiError(503, "catalog_unavailable", "Não foi possível consultar o catálogo agora. Tente novamente.") from error
     except AgentConfigurationError as error:
         raise ApiError(503, "agent_unavailable", "O agente não está disponível agora.") from error
+    except NoCompatibleProductError as error:
+        raise ApiError(422, "no_compatible_product", "Nenhum produto atende aos requisitos do pedido.") from error
     except AgentError as error:
         raise ApiError(422, "agent_result_invalid", "O agente não retornou uma compra válida.") from error
 
@@ -119,18 +134,20 @@ def list_purchase_requests() -> dict[str, Any]:
     return {"requisicoes": [{"numero": row[0], "pedido": row[1], "status": row[2], "valorTotal": float(row[3]), "criadaEm": row[4].isoformat()} for row in rows]}
 
 
-async def _validate_items(selected: list[Any], catalog: CatalogMcpClient, limit: Decimal | None) -> list[dict[str, Any]]:
+async def _validate_items(selected: list[Any], catalog: ExecutionCatalog, limit: Decimal | None) -> list[dict[str, Any]]:
     items = []
     for selected_item in selected:
+        if selected_item.produto_id not in catalog.searched_product_ids:
+            raise AgentError("O produto selecionado não foi encontrado na busca desta execução")
         result = await catalog.call_tool("detalhar_produto", {"id": selected_item.produto_id})
         detail = _tool_json(result)
         price = Decimal(str(detail.get("preco")))
         if price < 0 or (limit is not None and price > limit):
-            raise AgentError("Produto não é compatível com o teto informado")
+            raise NoCompatibleProductError("Produto não é compatível com o teto informado")
         quantity = selected_item.quantidade
         items.append({"produto_id": detail["id"], "titulo": detail["titulo"], "quantidade": quantity, "preco_unitario": price, "valor_total": price * quantity})
     if not items:
-        raise AgentError("Nenhum produto compatível foi encontrado")
+        raise NoCompatibleProductError("Nenhum produto compatível foi encontrado")
     return items
 
 

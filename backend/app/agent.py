@@ -22,6 +22,10 @@ class AgentConfigurationError(AgentError):
     pass
 
 
+class NoCompatibleProductError(AgentError):
+    pass
+
+
 class SelectedItem(BaseModel):
     produto_id: int = Field(gt=0)
     quantidade: int = Field(gt=0)
@@ -52,7 +56,7 @@ class LocalPurchaseAgent:
         products = _read_tool_result(await catalog.call_tool("buscar_produtos", {"termo": term}))
         candidates = products.get("produtos", [])
         if not candidates:
-            raise AgentError("Nenhum produto compatível foi encontrado")
+            raise NoCompatibleProductError("Nenhum produto compatível foi encontrado")
         product = candidates[0]
         return AgentDecision(
             itens=[SelectedItem(produto_id=product["id"], quantidade=quantity)],
@@ -99,8 +103,11 @@ class OpenRouterPurchaseAgent:
                 if not tool_calls:
                     return _parse_decision(message.get("content", ""))
                 for call in tool_calls:
-                    name = call["function"]["name"]
-                    arguments = json.loads(call["function"]["arguments"])
+                    try:
+                        name = call["function"]["name"]
+                        arguments = json.loads(call["function"]["arguments"])
+                    except (KeyError, TypeError, json.JSONDecodeError) as error:
+                        raise AgentError("O agente solicitou uma ferramenta inválida") from error
                     result = await catalog.call_tool(name, arguments)
                     messages.append(
                         {

@@ -6,7 +6,7 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
-from app.agent import AgentDecision, AgentError, SelectedItem
+from app.agent import AgentDecision, AgentError, NoCompatibleProductError, SelectedItem
 from app.mcp_client import McpClientError
 from app import main
 
@@ -16,9 +16,10 @@ class FakeAgent:
         self.items = items or [SelectedItem(produto_id=78, quantidade=3)]
         self.error = error
 
-    async def decide(self, _pedido, _catalog):
+    async def decide(self, _pedido, catalog):
         if self.error:
             raise self.error
+        await catalog.call_tool("buscar_produtos", {"termo": "laptop"})
         return AgentDecision(itens=self.items, justificativa="Seleção de teste.")
 
 
@@ -26,7 +27,9 @@ class FakeCatalog:
     def __init__(self, _url):
         self.fail_on: int | None = None
 
-    async def call_tool(self, _name, arguments):
+    async def call_tool(self, name, arguments):
+        if name == "buscar_produtos":
+            return SimpleNamespace(content=[SimpleNamespace(text=json.dumps({"produtos": [{"id": 78}, {"id": 79}]}))])
         product_id = arguments["id"]
         if self.fail_on == product_id:
             raise McpClientError("catálogo indisponível")
@@ -69,6 +72,28 @@ def test_agent_failure_does_not_persist(client):
     agent.error = AgentError("sem produto compatível")
 
     response = test_client.post("/requisicoes", json={"pedido": "Preciso de algo impossível."})
+
+    assert response.status_code == 422
+    assert response.json()["erro"]["codigo"] == "agent_result_invalid"
+    assert test_client.get("/requisicoes").json()["requisicoes"] == []
+
+
+def test_no_compatible_product_does_not_persist(client):
+    test_client, agent, _ = client
+    agent.error = NoCompatibleProductError("sem produto compatível")
+
+    response = test_client.post("/requisicoes", json={"pedido": "Preciso de algo impossível."})
+
+    assert response.status_code == 422
+    assert response.json()["erro"]["codigo"] == "no_compatible_product"
+    assert test_client.get("/requisicoes").json()["requisicoes"] == []
+
+
+def test_item_not_returned_by_search_does_not_persist(client):
+    test_client, agent, _ = client
+    agent.items = [SelectedItem(produto_id=999, quantidade=1)]
+
+    response = test_client.post("/requisicoes", json={"pedido": "Preciso de um laptop."})
 
     assert response.status_code == 422
     assert response.json()["erro"]["codigo"] == "agent_result_invalid"

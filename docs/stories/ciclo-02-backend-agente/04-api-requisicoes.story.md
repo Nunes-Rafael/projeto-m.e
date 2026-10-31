@@ -43,3 +43,4 @@ Implementar os endpoints, orquestração do agente, validação de teto por unid
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para fechar o fluxo persistente sem confiar cegamente na saída do agente. |
 | 2026-10-31 | Review | Implementados `POST` e `GET /requisicoes` com validação contra detalhes retornados pelo MCP, totais em Decimal e persistência em transação; o limite monetário brasileiro é normalizado antes da comparação. |
+| 2026-10-31 | Review | A validação passou a rastrear IDs obtidos em `buscar_produtos` durante a mesma execução e rejeita qualquer detalhe sem essa origem; itens acima do teto agora retornam `no_compatible_product`, sem persistência. |
