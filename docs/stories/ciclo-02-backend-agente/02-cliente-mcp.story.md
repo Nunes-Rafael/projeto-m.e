@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Implementar cliente MCP no backend, descoberta/registro explícito das duas tool
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para preservar a fronteira MCP entre agente e catálogo. |
+| 2026-10-31 | Review | Criado cliente MCP Streamable HTTP com allowlist, validação local de argumentos, descoberta obrigatória das duas ferramentas e erros internos estáveis. O backend continua sem cliente DummyJSON. |

@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Implementar schema, índices e migração/initialization idempotente para Postgr
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para tornar a persistência verificável e idempotente. |
+| 2026-10-31 | Review | Criadas tabelas normalizadas com valores `NUMERIC`, restrições, índices e inicialização idempotente no ciclo de vida do FastAPI, para o banco estar pronto antes da API aceitar tráfego. |
