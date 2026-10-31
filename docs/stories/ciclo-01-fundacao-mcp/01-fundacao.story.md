@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Criar somente a fundação de execução: estrutura de diretórios, Dockerfiles,
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para estabelecer o ambiente reproduzível antes de implementar comportamento. |
+| 2026-10-31 | Review | Criados os quatro serviços em `compose.yaml`, com imagens isoladas para backend, MCP e frontend, além de Postgres com volume e healthcheck. Os stubs de saúde permitem validar rede e ordem de inicialização sem antecipar a lógica de catálogo ou da interface. |
