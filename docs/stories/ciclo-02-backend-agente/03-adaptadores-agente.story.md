@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review
 
 ## Módulo
 
@@ -41,3 +41,4 @@ Definir uma interface única de agente e implementar os adaptadores local e Open
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Draft | Story criada para separar desenvolvimento sem segredo da execução real com tool-calling. |
+| 2026-10-31 | Review | Criados adaptadores local determinístico e OpenRouter em `backend/app/agent.py`; o modo real recebe schemas e resultados de tools em loop limitado a seis chamadas, enquanto o modo local permanece explicitamente voltado a desenvolvimento sem chave. |
