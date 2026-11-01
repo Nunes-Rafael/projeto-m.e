@@ -40,4 +40,12 @@ Criar testes de ponta a ponta ou de fronteira equivalente para sucesso, erro de 
 
 | Data | Status | Nota |
 |---|---|---|
-| 2026-10-31 | Draft | Story criada para provar o fluxo que será demonstrado, não detalhes internos de componentes. |
+| 2026-10-31 | Review | `docker compose up --build -d` subiu os quatro serviços; Vite serviu a página e `npm run build` passou. Backend e MCP passaram cada um 6 testes, sem chave de LLM. Não há runner de browser instalado, então não foi possível automatizar a interação real no navegador. Revisão visual do fluxo encontrou um desvio do aceite: erro temporário oferece “Editar pedido”, mas ainda não oferece a ação “Tentar novamente”. |
+
+## Evidências e pendências
+
+- Verificado: página HTML é servida em `http://localhost:5173/`; build de produção do frontend conclui.
+- Verificado: `docker compose exec -T backend python -m pytest -q` — 6 testes passam.
+- Verificado: `docker compose exec -T mcp-server python -m pytest -q` — 6 testes passam.
+- Pendente: teste de interação no browser e ação de nova tentativa no estado de indisponibilidade.
+- O comando de build está documentado em `README.md`; os comandos das suítes existentes também.
