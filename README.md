@@ -28,12 +28,14 @@ As tabelas são criadas automaticamente pelo backend na inicialização. O volum
 | `POSTGRES_USER` | Usuário do banco | `purchase_agent` |
 | `POSTGRES_PASSWORD` | Senha local do banco | Obrigatória em `.env` |
 | `MCP_SERVER_URL` | Endereço interno do servidor MCP | `http://mcp-server:8001` |
-| `AGENT_MODE` | Adaptador do agente: `local` ou `openrouter` | `local` |
+| `AGENT_MODE` | Adaptador do agente: `local`, `openrouter` ou `openai` | `local` |
 | `OPENROUTER_API_KEY` | Chave do provedor no modo OpenRouter | Vazia |
 | `OPENROUTER_MODEL` | Modelo com suporte a tool-calling | Vazio |
+| `OPENAI_API_KEY` | Chave da API OpenAI quando `AGENT_MODE=openai` | Vazia |
+| `OPENAI_MODEL` | Modelo OpenAI com suporte a tool-calling | `gpt-4.1-nano` |
 | `VITE_API_BASE_URL` | URL da API vista pelo navegador | `http://localhost:8000` |
 
-O modo `local` permite desenvolver e demonstrar o fluxo sem credencial de LLM; sua seleção de produto é determinística e não representa decisão de um modelo. Para experimentar tool-calling real, configure `AGENT_MODE=openrouter`, `OPENROUTER_API_KEY` e `OPENROUTER_MODEL` no `.env`. Nunca coloque credenciais no frontend ou em arquivos versionados. `.env` e o PDF do enunciado são ignorados pelo Git.
+O modo `local` permite desenvolver e demonstrar o fluxo sem credencial de LLM; sua seleção de produto é determinística e não representa decisão de um modelo. Para tool-calling real pela OpenAI, configure `AGENT_MODE=openai`, `OPENAI_API_KEY` e `OPENAI_MODEL` no `.env`. Para OpenRouter, use `AGENT_MODE=openrouter`, `OPENROUTER_API_KEY` e `OPENROUTER_MODEL`. Nunca coloque credenciais no frontend ou em arquivos versionados. `.env` e o PDF do enunciado são ignorados pelo Git.
 
 ## O que a aplicação faz
 
@@ -110,9 +112,11 @@ O servidor MCP é acessível ao backend pela rede privada do Compose. O navegado
 | `CICLO-01-FUNDACAO-MCP-Tasks.md` | Índice do ciclo de Compose, servidor MCP e testes. |
 | `CICLO-02-BACKEND-AGENTE-Tasks.md` | Índice do ciclo de persistência, agente e API. |
 | `CICLO-03-ENTREGA-Tasks.md` | Índice do ciclo de interface, README, testes e revisão final. |
+| `CICLO-04-DIFERENCIAIS-Tasks.md` | Planejamento dos opcionais: telemetria de tools no chat, script de avaliação, CI e tool de gravação MCP. |
 | `docs/stories/ciclo-01-fundacao-mcp/` | Stories e logs de execução da fundação e do servidor MCP. |
 | `docs/stories/ciclo-02-backend-agente/` | Stories e logs de execução do banco, agente e API. |
 | `docs/stories/ciclo-03-entrega/` | Stories e logs de execução da interface e preparação da entrega. |
+| `docs/stories/ciclo-04-diferenciais/` | Quatro stories detalhadas dos diferenciais opcionais; a tool de gravação tem gate arquitetural e de segurança antes da implementação. |
 
 Os logs das stories registram o que mudou, decisões tomadas e evidências de validação. O Git complementa esses registros com commits pequenos e mensagens descritivas.
 
@@ -127,6 +131,10 @@ SDD significa **Specification-Driven Development**: primeiro registramos o que c
 5. Implementação em commits rastreáveis, seguida por testes e revisão.
 
 Ferramentas de IA apoiaram planejamento, implementação e revisão sob supervisão humana; os documentos, testes e commits registram as decisões e resultados verificáveis.
+
+## Próximos diferenciais planejados
+
+O Ciclo 04 organiza os itens opcionais do desafio em stories independentes. A ordem recomendada é mostrar no chat as ferramentas MCP realmente chamadas, adicionar um script de avaliação com cinco cenários, configurar CI para lint e testes sem chamadas pagas e, por último, avaliar a terceira ferramenta MCP `criar_requisicao`. Esta última muda a fronteira de persistência e precisa de especificação e revisão de segurança antes de ser implementada. O plano detalhado e os critérios estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CICLO-04-DIFERENCIAIS-Tasks.md).
 
 ## API principal
 
