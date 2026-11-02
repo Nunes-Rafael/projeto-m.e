@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Done
 
 ## Módulo
 
@@ -32,14 +32,19 @@ Criar cinco cenários cobrindo: sucesso com teto e quantidade; termo alternativo
 
 ## Critérios de aceite
 
-- [ ] Os cinco casos identificados acima têm entrada, fixtures, expectativa e regra verificada documentadas.
-- [ ] Um único comando documentado executa os cinco casos sem chamar OpenAI, OpenRouter ou DummyJSON real.
-- [ ] A saída informa para cada caso aprovado/reprovado e motivo, além do total `N/5`; código de saída é zero somente quando todos passam.
-- [ ] Duas execuções com as mesmas fixtures produzem os mesmos resultados e não criam registros no banco de demonstração.
-- [ ] README documenta comando, pré-requisitos, resultado esperado e limite de que a avaliação mede critérios explícitos, não qualidade geral de respostas do modelo.
+- [x] Os cinco casos identificados acima têm entrada, fixtures, expectativa e regra verificada documentadas.
+- [x] Um único comando documentado executa os cinco casos sem chamar OpenAI, OpenRouter ou DummyJSON real.
+- [x] A saída informa para cada caso aprovado/reprovado e motivo, além do total `N/5`; código de saída é zero somente quando todos passam.
+- [x] Duas execuções com as mesmas fixtures produzem os mesmos resultados e não criam registros no banco de demonstração.
+- [x] README documenta comando, pré-requisitos, resultado esperado e limite de que a avaliação mede critérios explícitos, não qualidade geral de respostas do modelo.
+- [x] Limitação documentada: cenários usam fixtures determinísticas e não medem a seleção feita pelo agente real.
 
 ## Log de execução
 
 | Data | Status | Nota |
 |---|---|---|
-| 2026-11-02 | Draft | Story detalha o diferencial do script de avaliação, priorizando regras observáveis e isolamento dos dados locais. |
+| 2026-11-02 | Approved | Rafael aprovou o Ciclo 04 e liberou esta story para execução. Independente da Story 1. |
+| 2026-11-02 | Review | CLI e fixtures determinísticas implementadas; em container isolado, `python -m evaluation.run` resultou em 5/5 e 3 testes específicos passaram. Execução não usou provedor/catálogo externo nem banco PostgreSQL de demonstração. Mantida em Review, sem marcar a story concluída, até revisão dos artefatos e critérios. |
+| 2026-11-02 | Review | Revalidada após adaptação ao contrato da Story 4: CLI 5/5 e 3 testes passaram em container sem rede e sem `DATABASE_URL`/`MCP_SERVER_URL`; writer executado com mock em memória. Mantida em Review, sem marcar concluída. |
+| 2026-11-02 | Review | Revalidação atual: CLI 5/5 e 3 testes específicos passaram em container isolado, sem rede, banco ou MCP reais; writer mockado em memória. Aguarda revisão/QA final de Tanjiro; não marcada Done. |
+| 2026-11-02 | Done | QA Tanjiro aprovou. CLI 5/5 e 3 testes passaram em container isolado sem rede, banco ou MCP reais; writer mockado em memória. Limitação: fixtures determinísticas avaliam regras explícitas e não medem a seleção real do agente. |

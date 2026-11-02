@@ -2,7 +2,7 @@
 
 ## Status do ciclo
 
-Proposta em Draft. As quatro stories permanecem em Draft até Rafael aprovar o ciclo. A revisão técnica da Story 4 pode produzir a especificação, mas não autoriza sua implementação.
+Stories 1, 2 e 4 estão Done para o escopo da demonstração local. Story 3 está em Review: as verificações passaram localmente, mas o workflow ainda não foi executado no GitHub.
 
 ## Objetivo do ciclo
 
@@ -10,19 +10,20 @@ Acrescentar evidências de transparência, avaliação reproduzível e qualidade
 
 | # | Story | Resultado | Dependências |
 |---|---|---|---|
-| 1 | [Exibir ferramentas chamadas](docs/stories/ciclo-04-diferenciais/01-ferramentas-no-chat.story.md) | O chat mostra quais tools MCP foram usadas na requisição. | Ciclo 03 concluído |
-| 2 | [Script de avaliação com cinco pedidos](docs/stories/ciclo-04-diferenciais/02-script-avaliacao.story.md) | Execução reproduzível e relatório de acertos por cenário. | Ciclo 03 concluído; API e modo local |
-| 3 | [CI de lint e testes](docs/stories/ciclo-04-diferenciais/03-ci-lint-testes.story.md) | Pipeline valida código e testes sem chamadas pagas. | Stories 1 e 2 |
-| 4 | [Tool MCP para criar requisição](docs/stories/ciclo-04-diferenciais/04-tool-criar-requisicao.story.md) | O agente pode solicitar a persistência após a seleção; backend valida e mantém atomicidade. | Ciclo 03 concluído; especificação de Senku em `docs/architecture/OPCIONAIS-ARCH.md` revisada e aprovada por Rafael antes de implementar |
+| 1 | [Exibir ferramentas chamadas](docs/stories/ciclo-04-diferenciais/01-ferramentas-no-chat.story.md) — Done | O chat mostra quais tools MCP foram usadas na requisição, incluindo `criar_requisicao` quando retornada. | Tanjiro aprovou correção; 4 testes UI + build, 2 backend unitários e 16 integrações DB isoladas passaram |
+| 2 | [Script de avaliação com cinco pedidos](docs/stories/ciclo-04-diferenciais/02-script-avaliacao.story.md) — Done | Execução reproduzível e relatório de acertos por cenário. | QA Tanjiro aprovado; fixtures não medem seleção real do agente |
+| 3 | [CI de lint e testes](docs/stories/ciclo-04-diferenciais/03-ci-lint-testes.story.md) — Review | Pipeline valida código e testes sem chamadas pagas. | Comandos verificados localmente; execução no GitHub pendente |
+| 4 | [Tool MCP para criar requisição](docs/stories/ciclo-04-diferenciais/04-tool-criar-requisicao.story.md) — Done | O agente solicita a persistência após a seleção; backend valida e MCP grava com atomicidade. | 20 testes MCP + 7 grants em banco descartável; QA Tanjiro aprovado; risco residual local documentado |
 
 ## Ordem e gates
 
-As Stories 1 e 2 podem ser desenvolvidas independentemente após o Ciclo 03. A Story 3 depende dos comandos e verificações definidos nas Stories 1 e 2. A Story 4 é independente dessas entregas: Senku documenta a arquitetura em `docs/architecture/OPCIONAIS-ARCH.md`; Rafael revisa e aprova essa especificação e o escopo da story antes de qualquer implementação. A revisão de segurança é um gate de conclusão da Story 4.
+S1, S2 e S4 estão Done após QA. S2 usa fixtures determinísticas que não medem seleção real do agente. S4 foi aprovada para a demonstração local após testes isolados de autenticação, persistência, rollback, idempotência, grants e sanitização; a captura de logs cobriu nível INFO, não DEBUG do SDK MCP. O risco residual do role de escrita está documentado e o aceite não autoriza uso em produção. A Story 3 foi validada localmente, mas permanece em Review até uma execução externa do workflow no GitHub.
 
 ## Gate de saída
 
 - A interface identifica tools chamadas com dados reais da execução.
 - O script de cinco cenários gera resultado legível e verifica conteúdo sem depender de igualdade textual do LLM.
 - CI executa lint e testes sem segredos ou consumo de API.
-- As quatro stories continuam Draft até a aprovação de Rafael.
-- A Story 4 não começa a ser implementada sem `docs/architecture/OPCIONAIS-ARCH.md` revisado e aprovado por Rafael; nenhum pedido incompatível ou não validado pode ser persistido.
+- Stories 1, 2 e 4 estão Done para a demonstração local.
+- Story 3 permanece em Review até a execução do workflow no GitHub.
+- Na Story 4, evidências devem comprovar fail-closed, grants efetivos, idempotência concorrente, rollback integral e sanitização. O risco residual da demonstração local permanece documentado e não autoriza uso em produção.
