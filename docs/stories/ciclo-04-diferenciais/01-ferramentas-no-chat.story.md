@@ -14,7 +14,8 @@ Vegeta e Gohan
 
 ## Dependências
 
-Ciclo 03 concluído.
+- Ciclo 03 concluído, incluindo contrato atual de resposta da API.
+- Aprovação de Rafael para iniciar o Ciclo 04.
 
 ## Prioridade
 
@@ -31,10 +32,10 @@ Registrar no backend os nomes das ferramentas MCP chamadas durante uma única re
 ## Critérios de aceite
 
 - [ ] Uma resposta bem-sucedida inclui apenas tools efetivamente chamadas naquela execução.
-- [ ] O chat mostra os nomes das tools sem exibir argumentos ou dados sensíveis.
+- [ ] O chat apresenta os nomes dessas tools no resultado da requisição, sem argumentos, payloads, credenciais ou identificadores internos.
 - [ ] Modo local e OpenAI/OpenRouter usam o mesmo contrato de telemetria.
-- [ ] Falhas não mostram tools de uma requisição anterior.
-- [ ] Testes cobrem execução com uma tool, duas tools e nenhuma persistência em falha.
+- [ ] A lista é reiniciada a cada envio; falha ou requisição seguinte não reutiliza tools de execução anterior.
+- [ ] Testes verificam resposta com uma tool, múltiplas tools, nenhuma tool e falha, incluindo que a interface não mostre dados de execução anterior.
 
 ## Log de execução
 

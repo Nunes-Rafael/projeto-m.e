@@ -132,9 +132,9 @@ SDD significa **Specification-Driven Development**: primeiro registramos o que c
 
 Ferramentas de IA apoiaram planejamento, implementação e revisão sob supervisão humana; os documentos, testes e commits registram as decisões e resultados verificáveis.
 
-## Próximos diferenciais planejados
+## Próximo ciclo
 
-O Ciclo 04 organiza os itens opcionais do desafio em stories independentes. A ordem recomendada é mostrar no chat as ferramentas MCP realmente chamadas, adicionar um script de avaliação com cinco cenários, configurar CI para lint e testes sem chamadas pagas e, por último, avaliar a terceira ferramenta MCP `criar_requisicao`. Esta última muda a fronteira de persistência e precisa de especificação e revisão de segurança antes de ser implementada. O plano detalhado e os critérios estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CICLO-04-DIFERENCIAIS-Tasks.md).
+O plano proposto para o Ciclo 04 e suas stories estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CICLO-04-DIFERENCIAIS-Tasks.md); permanece sujeito à aprovação de Rafael.
 
 ## API principal
 

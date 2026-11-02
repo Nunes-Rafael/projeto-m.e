@@ -14,7 +14,9 @@ Tanjiro e Gohan
 
 ## Dependências
 
-Story 1; backend e modo local disponíveis.
+- Ciclo 03 concluído; API e modo local disponíveis.
+- Aprovação de Rafael para iniciar o Ciclo 04.
+- Independente da Story 1: o script avalia resultados de negócio pela API, não a telemetria exibida no chat.
 
 ## Prioridade
 
@@ -26,15 +28,15 @@ O case sugere um script com cinco pedidos e uma contagem de acertos. O modo loca
 
 ## O que fazer
 
-Criar cinco cenários cobrindo sucesso com teto e quantidade, termo de produto diferente, produto acima do teto, busca sem resultado e erro recuperável do catálogo. O script prepara dependências de teste, executa os casos isoladamente e imprime `N/5` com detalhe por caso. Não deve contaminar o banco de demonstração; usar banco temporário/teste ou limpeza transacional segura.
+Criar cinco cenários cobrindo: sucesso com teto e quantidade; termo alternativo para produto compatível; produto acima do teto; busca sem resultado; erro recuperável do catálogo. Documentar por cenário entrada, pré-condições/fixture, resultado esperado e regra verificada. Executar contra dependências controladas e isoladas, sem contaminar o banco de demonstração, e imprimir `N/5` com estado e motivo por caso. A escolha do produto deve ser validada por propriedades de negócio, não por correspondência textual rígida quando houver mais de uma resposta válida.
 
 ## Critérios de aceite
 
-- [ ] Os cinco casos têm entrada, expectativa e justificativa documentadas.
-- [ ] A execução padrão não chama OpenAI, OpenRouter ou DummyJSON real.
-- [ ] O resumo mostra total de aprovados e falhas com motivo.
-- [ ] Reexecuções são determinísticas e não deixam registros no banco de demonstração.
-- [ ] README documenta comando, pré-requisitos e interpretação do resultado.
+- [ ] Os cinco casos identificados acima têm entrada, fixtures, expectativa e regra verificada documentadas.
+- [ ] Um único comando documentado executa os cinco casos sem chamar OpenAI, OpenRouter ou DummyJSON real.
+- [ ] A saída informa para cada caso aprovado/reprovado e motivo, além do total `N/5`; código de saída é zero somente quando todos passam.
+- [ ] Duas execuções com as mesmas fixtures produzem os mesmos resultados e não criam registros no banco de demonstração.
+- [ ] README documenta comando, pré-requisitos, resultado esperado e limite de que a avaliação mede critérios explícitos, não qualidade geral de respostas do modelo.
 
 ## Log de execução
 

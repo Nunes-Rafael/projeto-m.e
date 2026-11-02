@@ -14,7 +14,8 @@ Itachi e Tanjiro
 
 ## Dependências
 
-Stories 1 e 2; comandos locais estáveis.
+- Stories 1 e 2 aprovadas e concluídas; seus comandos de lint, build e avaliação documentados e executáveis localmente.
+- Aprovação de Rafael para iniciar o Ciclo 04.
 
 ## Prioridade
 
@@ -30,12 +31,12 @@ Adicionar GitHub Actions para lint/build do frontend, testes Python do backend e
 
 ## Critérios de aceite
 
-- [ ] Workflow roda em pull request e push para branch principal.
-- [ ] Frontend compila e passa lint configurado.
-- [ ] Testes de backend e MCP passam sem chaves nem chamadas externas.
-- [ ] Compose valida sem iniciar serviços que exijam segredo real; placeholders de teste são explícitos.
-- [ ] Falha em qualquer etapa deixa o workflow vermelho com etapa identificável.
-- [ ] README mostra o que a CI verifica e seus limites.
+- [ ] Workflow executa em pull request e push para `main`.
+- [ ] Workflow executa lint e build do frontend e retorna falha se qualquer comando falhar.
+- [ ] Workflow executa testes do backend, MCP e os cinco cenários de avaliação sem chaves de provedor nem tráfego para catálogo externo.
+- [ ] Validação do Compose usa apenas placeholders explícitos e não publica imagens nem inicia deploy.
+- [ ] Cada etapa tem nome identificável e qualquer falha torna o workflow malsucedido.
+- [ ] README descreve verificações executadas e informa que CI não valida chamadas reais ao provedor/modelo.
 
 ## Log de execução
 
