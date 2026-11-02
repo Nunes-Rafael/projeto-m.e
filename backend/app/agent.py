@@ -8,10 +8,11 @@ from typing import Any, Protocol
 import httpx
 from pydantic import BaseModel, Field, ValidationError
 
-from app.mcp_client import CatalogMcpClient
+from app.mcp_client import CatalogMcpClient, McpClientError
 
 MAX_TOOL_CALLS = 6
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 
 
 class AgentError(Exception):
@@ -22,13 +23,22 @@ class AgentConfigurationError(AgentError):
     pass
 
 
+class AgentProviderError(AgentError):
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+
+
+class AgentPersistenceError(AgentError):
+    pass
+
+
 class NoCompatibleProductError(AgentError):
     pass
 
 
 class SelectedItem(BaseModel):
-    produto_id: int = Field(gt=0)
-    quantidade: int = Field(gt=0)
+    produto_id: int = Field(gt=0, strict=True)
+    quantidade: int = Field(ge=1, le=100, strict=True)
 
 
 class AgentDecision(BaseModel):
@@ -46,6 +56,12 @@ def get_purchase_agent() -> PurchaseAgent:
         return LocalPurchaseAgent()
     if mode == "openrouter":
         return OpenRouterPurchaseAgent.from_environment()
+    if mode == "openai":
+        return OpenRouterPurchaseAgent.from_environment(
+            api_key_name="OPENAI_API_KEY",
+            model_name="OPENAI_MODEL",
+            api_url=OPENAI_URL,
+        )
     raise AgentConfigurationError("Modo de agente inválido")
 
 
@@ -58,6 +74,11 @@ class LocalPurchaseAgent:
         if not candidates:
             raise NoCompatibleProductError("Nenhum produto compatível foi encontrado")
         product = candidates[0]
+        arguments = {
+            "itens": [{"produto_id": product["id"], "quantidade": quantity}],
+            "justificativa": "Modo local: seleção determinística para desenvolvimento.",
+        }
+        _read_tool_result(await catalog.call_tool("criar_requisicao", arguments))
         return AgentDecision(
             itens=[SelectedItem(produto_id=product["id"], quantidade=quantity)],
             justificativa="Modo local: seleção determinística para desenvolvimento.",
@@ -65,49 +86,76 @@ class LocalPurchaseAgent:
 
 
 class OpenRouterPurchaseAgent:
-    def __init__(self, api_key: str, model: str) -> None:
+    def __init__(self, api_key: str, model: str, api_url: str = OPENROUTER_URL) -> None:
         self.api_key = api_key
         self.model = model
+        self.api_url = api_url
 
     @classmethod
-    def from_environment(cls) -> "OpenRouterPurchaseAgent":
-        api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
-        model = os.getenv("OPENROUTER_MODEL", "").strip()
+    def from_environment(
+        cls,
+        api_key_name: str = "OPENROUTER_API_KEY",
+        model_name: str = "OPENROUTER_MODEL",
+        api_url: str = OPENROUTER_URL,
+    ) -> "OpenRouterPurchaseAgent":
+        api_key = os.getenv(api_key_name, "").strip()
+        model = os.getenv(model_name, "").strip()
         if not api_key or not model:
-            raise AgentConfigurationError("O modo OpenRouter exige chave e modelo configurados")
-        return cls(api_key, model)
+            raise AgentConfigurationError(f"O modo configurado exige {api_key_name} e {model_name}")
+        return cls(api_key, model, api_url)
 
     async def decide(self, pedido: str, catalog: CatalogMcpClient) -> AgentDecision:
         messages: list[dict[str, Any]] = [
             {
                 "role": "system",
                 "content": (
-                    "Você é um agente de compras. Use ferramentas quando precisar de dados do catálogo. "
-                    "Nunca invente produtos ou preços. Ao finalizar, responda somente JSON com itens "
-                    "({produto_id, quantidade}) e justificativa."
+                    "Você é um agente de compras. Use buscar_produtos para consultar o catálogo e nunca invente produtos ou preços. "
+                    "Depois de escolher produtos compatíveis, chame criar_requisicao informando somente produto_id e quantidade; "
+                    "a tool só aparecerá após existir resultado de busca. Não envie preço nem total."
                 ),
             },
             {"role": "user", "content": pedido},
         ]
+        tool_calls_made = 0
         async with httpx.AsyncClient(timeout=15) as client:
             for _ in range(MAX_TOOL_CALLS):
-                response = await client.post(
-                    OPENROUTER_URL,
-                    headers={"Authorization": f"Bearer {self.api_key}"},
-                    json={"model": self.model, "messages": messages, "tools": _tool_schemas()},
-                )
-                response.raise_for_status()
-                message = response.json()["choices"][0]["message"]
+                try:
+                    response = await client.post(
+                        self.api_url,
+                        headers={"Authorization": f"Bearer {self.api_key}"},
+                        json={"model": self.model, "messages": messages, "tools": _tool_schemas(bool(getattr(catalog, "searched_product_ids", set())))},
+                    )
+                    response.raise_for_status()
+                    message = response.json()["choices"][0]["message"]
+                except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as error:
+                    reason = "provider_unavailable"
+                    if isinstance(error, httpx.HTTPStatusError):
+                        provider_message = error.response.text.lower()
+                        if "limit exceeded" in provider_message or "quota" in provider_message:
+                            reason = "key_limit_exceeded"
+                    raise AgentProviderError(reason) from error
                 messages.append(message)
                 tool_calls = message.get("tool_calls") or []
                 if not tool_calls:
                     return _parse_decision(message.get("content", ""))
                 for call in tool_calls:
+                    tool_calls_made += 1
+                    if tool_calls_made > MAX_TOOL_CALLS:
+                        raise AgentError("O agente excedeu o limite de chamadas de ferramenta")
                     try:
                         name = call["function"]["name"]
                         arguments = json.loads(call["function"]["arguments"])
                     except (KeyError, TypeError, json.JSONDecodeError) as error:
                         raise AgentError("O agente solicitou uma ferramenta inválida") from error
+                    if name == "criar_requisicao":
+                        if not getattr(catalog, "searched_product_ids", set()):
+                            raise AgentError("O agente solicitou gravação sem candidatos do catálogo")
+                        try:
+                            result = await catalog.call_tool(name, arguments)
+                            _read_tool_result(result)
+                            return _decision_from_requisition_intent(arguments)
+                        except (McpClientError, ValueError, ValidationError) as error:
+                            raise AgentPersistenceError("A gravação da requisição não foi confirmada") from error
                     result = await catalog.call_tool(name, arguments)
                     messages.append(
                         {
@@ -119,8 +167,8 @@ class OpenRouterPurchaseAgent:
         raise AgentError("O agente excedeu o limite de chamadas de ferramenta")
 
 
-def _tool_schemas() -> list[dict[str, Any]]:
-    return [
+def _tool_schemas(include_create: bool = False) -> list[dict[str, Any]]:
+    schemas = [
         {
             "type": "function",
             "function": {
@@ -138,6 +186,48 @@ def _tool_schemas() -> list[dict[str, Any]]:
             },
         },
     ]
+    if include_create:
+        schemas.append(
+            {
+                "type": "function",
+                "function": {
+                    "name": "criar_requisicao",
+                    "description": "Confirma a intenção de criar a requisição. Informe somente produto_id e quantidade escolhidos no catálogo; o backend valida preços e persiste com segurança.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "itens": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 20,
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "produto_id": {"type": "integer", "minimum": 1},
+                                        "quantidade": {"type": "integer", "minimum": 1, "maximum": 100},
+                                    },
+                                    "required": ["produto_id", "quantidade"],
+                                    "additionalProperties": False,
+                                },
+                            },
+                            "justificativa": {"type": "string", "maxLength": 1000},
+                        },
+                        "required": ["itens"],
+                        "additionalProperties": False,
+                    },
+                },
+            }
+        )
+    return schemas
+
+
+def _decision_from_requisition_intent(arguments: dict[str, Any]) -> AgentDecision:
+    try:
+        items = [SelectedItem.model_validate(item) for item in arguments["itens"]]
+        justification = arguments.get("justificativa") or "Requisição validada e registrada."
+        return AgentDecision(itens=items, justificativa=justification)
+    except (KeyError, TypeError, ValidationError) as error:
+        raise AgentError("A intenção de gravação do agente é inválida") from error
 
 
 def _read_tool_result(result: Any) -> dict[str, Any]:

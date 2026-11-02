@@ -12,18 +12,39 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - database_net
+
+  db-migrate:
+    build: ./backend
+    command: ["python", "-m", "app.migrate"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-purchase_agent}
+      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_USER:-purchase_agent}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-purchase_agent}
+      PURCHASE_API_DB_USER: ${PURCHASE_API_DB_USER:-purchase_api}
+      PURCHASE_API_DB_PASSWORD: ${PURCHASE_API_DB_PASSWORD:?PURCHASE_API_DB_PASSWORD must be set}
+      MCP_DB_USER: ${MCP_DB_USER:-purchase_mcp}
+      MCP_DB_PASSWORD: ${MCP_DB_PASSWORD:?MCP_DB_PASSWORD must be set}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - database_net
 
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-purchase_agent}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-purchase_agent}
+      DATABASE_URL: postgresql://${PURCHASE_API_DB_USER:-purchase_api}:${PURCHASE_API_DB_PASSWORD:?PURCHASE_API_DB_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-purchase_agent}
       MCP_SERVER_URL: ${MCP_SERVER_URL:-http://mcp-server:8001}
+      MCP_WRITE_TOKEN: ${MCP_WRITE_TOKEN:?MCP_WRITE_TOKEN must be set}
       AGENT_MODE: ${AGENT_MODE:-local}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-nano}
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
       mcp-server:
         condition: service_healthy
     ports:
@@ -33,14 +54,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - service_net
+      - database_net
+      - egress_net
 
   mcp-server:
     build: ./mcp-server
+    environment:
+      MCP_DATABASE_URL: postgresql://${MCP_DB_USER:-purchase_mcp}:${MCP_DB_PASSWORD:?MCP_DB_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-purchase_agent}
+      MCP_WRITE_TOKEN: ${MCP_WRITE_TOKEN:?MCP_WRITE_TOKEN must be set}
+    depends_on:
+      db-migrate:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - service_net
+      - database_net
+      - egress_net
 
   frontend:
     build: ./frontend
@@ -56,6 +91,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+networks:
+  service_net:
+    internal: true
+  database_net:
+    internal: true
+  egress_net: {}
 
 volumes:
   postgres_data:
