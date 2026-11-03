@@ -16,6 +16,7 @@ APPROVED_MAX_COST_USD = Decimal("0.50")
 MODEL = "gpt-5.4-nano"
 INPUT_USD_PER_MILLION_TOKENS = Decimal("0.20")
 OUTPUT_USD_PER_MILLION_TOKENS = Decimal("1.25")
+APPROVED_PRICE_PROFILE = (Decimal("0.20"), Decimal("1.25"))
 COST_SAFETY_MULTIPLIER = Decimal("1.25")
 MAX_COMPLETION_TOKENS = 512
 MAX_REQUEST_BODY_BYTES = 32 * 1024
@@ -192,6 +193,8 @@ def run_live_evaluation(max_cost_usd: Decimal) -> int:
         return _configuration_error("OPENAI_API_KEY is not configured")
     if model != MODEL:
         return _configuration_error("Configured model has no approved price entry")
+    if (INPUT_USD_PER_MILLION_TOKENS, OUTPUT_USD_PER_MILLION_TOKENS) != APPROVED_PRICE_PROFILE:
+        return _configuration_error("Configured model price profile has changed")
     if max_cost_usd > APPROVED_MAX_COST_USD:
         return _configuration_error("Requested budget exceeds the approved limit")
 

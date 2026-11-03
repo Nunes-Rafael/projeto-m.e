@@ -202,7 +202,7 @@ def main_cli(argv: list[str] | None = None) -> int:
     parser.add_argument("--live", action="store_true", help="Executa os cinco cenários com o LLM configurado; pode gerar custo.")
     parser.add_argument("--confirm-paid", action="store_true", help="Confirma explicitamente chamadas pagas; obrigatório com --live.")
     parser.add_argument("--max-cost-usd", type=Decimal, help="Teto de custo para --live, limitado a US$ 0,50.")
-    args = parser.parse_args(argv)
+    args = parser.parse_args([] if argv is None else argv)
     if args.live:
         if not args.confirm_paid:
             parser.error("--live exige --confirm-paid")
