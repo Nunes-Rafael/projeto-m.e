@@ -2,7 +2,7 @@
 
 ## Status
 
-InProgress — orçamento de US$ 0,50 por execução aprovado; implementação em andamento. Execução real pendente.
+Review — implementação e avaliação real concluídas; falta cobertura automatizada específica para o guard de custo e configuração.
 
 ## Módulo
 
@@ -12,9 +12,9 @@ Avaliação do agente
 
 - Senku: arquitetura em `docs/architecture/AVALIACAO-LLM-ARCH.md` (concluída).
 - Levi: coordenação do Ciclo 05 e dependências (em andamento).
-- Gohan: implementação no backend Python.
-- Tanjiro: revisar critérios funcionais, isolamento e guard de custo antes da execução paga.
-- Shinobu: atualizar README e registrar saída da avaliação após a execução.
+- Gohan: implementação no backend Python (concluída).
+- Tanjiro: revisão estática de critérios funcionais, isolamento e guard de custo (aprovada sem achados bloqueantes).
+- Shinobu: README e resultado da avaliação atualizados.
 
 ## Dependências
 
@@ -50,8 +50,9 @@ Limites obrigatórios: até cinco cenários, seis chamadas ao provedor por cená
 - [ ] A saída não contém chave, headers, request/response completos ou prompts; mostra modelo, tokens, estimativa, resultado por caso e `N/5`.
 - [ ] O modo real não é executado na CI; CI permanece sem segredos, tráfego de modelo ou custo.
 - [ ] README descreve ambos os modos, pré-requisitos, limites, custo e diferença entre fixture/live.
-- [ ] Tanjiro revisa a implementação e confirma estaticamente que o modo real injeta fixtures, não conecta a PostgreSQL/MCP/DummyJSON e respeita o teto antes de cada chamada.
-- [ ] Uma execução real autorizada por Rafael reporta usage e reserva/estimativa; a reserva do programa nunca excede US$ 0,50. A documentação deixa claro que isso não limita absolutamente a cobrança efetiva.
+- [x] Tanjiro revisou estaticamente e confirmou injeção de fixtures, ausência de acesso a PostgreSQL/MCP/DummyJSON, reserva antes de cada chamada e saída sem prompts, respostas completas, headers ou chave.
+- [x] Uma execução real autorizada por Rafael foi registrada com usage e estimativa; a reserva calculada permanece abaixo de US$ 0,50. A documentação deixa claro que isso não limita absolutamente a cobrança efetiva.
+- [ ] Testes automatizados específicos cobrem recusa prévia por teto, limite de tamanho, ausência de usage e configuração de preço/modelo inválida.
 
 ## Log de execução
 
@@ -59,4 +60,5 @@ Limites obrigatórios: até cinco cenários, seis chamadas ao provedor por cená
 |---|---|---|
 | 2026-11-03 | Approved | Rafael aprovou a extensão, definiu o limite de US$ 0,50 por execução e autorizou usar o modelo configurado em `.env`. |
 | 2026-11-03 | InProgress | Senku concluiu a arquitetura. Levi organizou o ciclo; Gohan implementa o modo opt-in. Nenhuma chamada paga foi feita. Tanjiro revisará isolamento e custo antes da execução autorizada. |
-| 2026-11-03 | InProgress | Tanjiro aprovou a revisão estática: opt-in CLI exige `--live --confirm-paid --max-cost-usd`; só o adaptador OpenAI faz rede, enquanto busca/detalhe/gravação usam fixtures e memória; guarda reserva custo estimado antes de cada chamada, sem retries; saída não imprime pedidos, respostas completas, headers ou chave; cinco cenários verificam produto, quantidade, teto, total e uma gravação simulada. Nenhum teste foi criado ou executado e nenhuma chamada paga foi feita nesta revisão. A execução autorizada ainda é necessária para concluir a story. |
+| 2026-11-03 | InProgress | Tanjiro aprovou a revisão estática: opt-in CLI exige `--live --confirm-paid --max-cost-usd`; só o adaptador OpenAI faz rede, enquanto busca/detalhe/gravação usam fixtures e memória; guarda reserva custo estimado antes de cada chamada, sem retries; saída não imprime pedidos, respostas completas, headers ou chave; cinco cenários verificam produto, quantidade, teto, total e uma gravação simulada. Naquele momento, nenhum teste ou chamada paga havia sido executado; a avaliação live ocorreu após essa revisão. |
+| 2026-11-03 | Review | Execução autorizada com `gpt-5.4-nano`: cinco cenários passaram (5/5) em 13 chamadas, com 5.346 tokens de entrada, 456 de saída e estimativa de US$ 0,00205 incluindo margem de 25%; teto estimado máximo calculado de US$ 0,30048. O catálogo e gravador foram fixtures em memória; não houve acesso a PostgreSQL, MCP ou DummyJSON reais. README e índice atualizados. Os testes automatizados específicos do guard/configuração seguem pendentes, portanto a story fica em Review. |

@@ -241,9 +241,9 @@ O planejamento e as evidências estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CIC
 | 3. CI de lint e testes | Done | Workflow executado no GitHub para o commit de entrega; jobs Python, frontend e configuration concluíram com sucesso. |
 | 4. Tool `criar_requisicao` | Done para demonstração local | MCP writer autenticado, idempotência e roles separadas; risco residual documentado. Testes de logs cobrem INFO, não DEBUG do SDK MCP. |
 
-## Ciclo 05 planejado: avaliação do agente real
+## Ciclo 05: avaliação do agente real
 
-A extensão aprovada executará cinco pedidos sintéticos com o modelo OpenAI configurado no `.env`, usando catálogo e persistência em memória. O teto aprovado é US$ 0,50 por execução. A implementação e a execução ainda estão pendentes; os limites estão descritos em [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md) e na [story](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md). O modo determinístico continua sendo o único usado pela CI.
+O modo opt-in executou cinco pedidos sintéticos com o modelo `gpt-5.4-nano` e fixtures de catálogo e persistência em memória. Resultado: **5/5**, 13 chamadas, 5.346 tokens de entrada, 456 de saída e custo estimado de **US$ 0,00205**, incluindo margem de 25%. O teto da reserva estimada é US$ 0,50; a cobrança efetiva pode divergir. O modo determinístico continua sendo o único usado pela CI. A story está em Review enquanto aguardamos testes automatizados específicos do guard de custo e configuração. Consulte [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md), o [planejamento do Ciclo 05](CICLO-05-AVALIACAO-LLM-Tasks.md) e a [story](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md).
 
 ## API principal
 
