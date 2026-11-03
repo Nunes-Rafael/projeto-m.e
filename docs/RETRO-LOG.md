@@ -10,7 +10,7 @@
 
 - A regressão em `main_cli(None)` fez o parser consumir argumentos do processo pytest; Gohan corrigiu o caminho para usar argumentos explícitos.
 - Permanecem avisos de depreciação no Starlette/TestClient e em dependências do servidor MCP; não impediram a conclusão das suítes.
-- A CI passou nos três jobs no commit `849c009`. A validação de serviços criou e listou uma requisição usando DummyJSON, tools MCP e PostgreSQL descartável, sem chave de LLM. O fluxo manual posterior usou OpenAI e confirmou a gravação; a automação de browser e os fluxos de erro/retry da Story do Ciclo 03 permanecem pendentes.
+- A CI passou nos três jobs no commit `9731db0`. Commits posteriores precisam de nova execução para confirmar a versão atual. A validação de serviços criou e listou uma requisição usando DummyJSON, tools MCP e PostgreSQL descartável, sem chave de LLM. O fluxo manual posterior usou OpenAI e confirmou a gravação; a automação de browser e os fluxos de erro/retry da Story do Ciclo 03 permanecem pendentes.
 
 **Muda no próximo Cycle**:
 
