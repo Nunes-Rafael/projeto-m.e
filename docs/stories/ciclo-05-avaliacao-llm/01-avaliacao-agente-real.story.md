@@ -2,7 +2,7 @@
 
 ## Status
 
-Review — implementação e avaliação real concluídas; falta cobertura automatizada específica para o guard de custo e configuração.
+Done — implementação, avaliação autorizada e cobertura automatizada focada concluídas.
 
 ## Módulo
 
@@ -11,7 +11,7 @@ Avaliação do agente
 ## Responsáveis e gates
 
 - Senku: arquitetura em `docs/architecture/AVALIACAO-LLM-ARCH.md` (concluída).
-- Levi: coordenação do Ciclo 05 e dependências (em andamento).
+- Levi: coordenação do Ciclo 05 e dependências (concluída).
 - Gohan: implementação no backend Python (concluída).
 - Tanjiro: revisão estática de critérios funcionais, isolamento e guard de custo (aprovada sem achados bloqueantes).
 - Shinobu: README e resultado da avaliação atualizados.
@@ -40,19 +40,19 @@ Limites obrigatórios: até cinco cenários, seis chamadas ao provedor por cená
 
 ## Critérios de aceite
 
-- [ ] `python -m evaluation.run` continua executando apenas os cinco cenários determinísticos e não exige chave/rede.
-- [ ] `python -m evaluation.run --live --confirm-paid --max-cost-usd 0.50` é o único caminho ao modo pago e valida modo OpenAI, chave, modelo e os dois opt-ins.
-- [ ] O modo pago executa no máximo cinco pedidos com o modelo configurado no `.env`, usando fixtures de catálogo e persistência em memória.
-- [ ] Cada caso verifica produto aceito, quantidade, teto unitário, total recalculado e persistência simulada.
-- [ ] O agente é chamado diretamente com fixtures; o processo não usa endpoint HTTP/`TestClient` e não conecta ao PostgreSQL/MCP nem ao catálogo externo.
-- [ ] O preflight usa limites de request/tokens e tarifa conhecida com margem; recusa antes de enviar se a reserva estimada exceder US$ 0,50.
-- [ ] Ausência de usage ou tarifa/modelo conhecido falha fechado, sem tentativa de contornar o limite.
-- [ ] A saída não contém chave, headers, request/response completos ou prompts; mostra modelo, tokens, estimativa, resultado por caso e `N/5`.
-- [ ] O modo real não é executado na CI; CI permanece sem segredos, tráfego de modelo ou custo.
-- [ ] README descreve ambos os modos, pré-requisitos, limites, custo e diferença entre fixture/live.
+- [x] `python -m evaluation.run` continua executando apenas os cinco cenários determinísticos e não exige chave/rede.
+- [x] `python -m evaluation.run --live --confirm-paid --max-cost-usd 0.50` é o único caminho ao modo pago e valida modo OpenAI, chave, modelo e os dois opt-ins.
+- [x] O modo pago executa no máximo cinco pedidos com o modelo configurado no `.env`, usando fixtures de catálogo e persistência em memória.
+- [x] Cada caso verifica produto aceito, quantidade, teto unitário, total recalculado e persistência simulada.
+- [x] O agente é chamado diretamente com fixtures; o processo não usa endpoint HTTP/`TestClient` e não conecta ao PostgreSQL/MCP nem ao catálogo externo.
+- [x] O preflight usa limites de request/tokens e tarifa conhecida com margem; recusa antes de enviar se a reserva estimada exceder US$ 0,50.
+- [x] Ausência de usage ou tarifa/modelo conhecido falha fechado, sem tentativa de contornar o limite.
+- [x] A saída não contém chave, headers, request/response completos ou prompts; mostra modelo, tokens, estimativa, resultado por caso e `N/5`.
+- [x] O modo real não é executado na CI; CI permanece sem segredos, tráfego de modelo ou custo.
+- [x] README descreve ambos os modos, pré-requisitos, limites, custo e diferença entre fixture/live.
 - [x] Tanjiro revisou estaticamente e confirmou injeção de fixtures, ausência de acesso a PostgreSQL/MCP/DummyJSON, reserva antes de cada chamada e saída sem prompts, respostas completas, headers ou chave.
 - [x] Uma execução real autorizada por Rafael foi registrada com usage e estimativa; a reserva calculada permanece abaixo de US$ 0,50. A documentação deixa claro que isso não limita absolutamente a cobrança efetiva.
-- [ ] Testes automatizados específicos cobrem recusa prévia por teto, limite de tamanho, ausência de usage e configuração de preço/modelo inválida.
+- [x] Testes automatizados específicos cobrem recusa prévia por teto, limite de tamanho, ausência/invalidez de usage, divergência de configuração/tarifa/modelo, teto acima do aprovado, flags CLI inválidas e isolamento do modo padrão.
 
 ## Log de execução
 
@@ -62,3 +62,5 @@ Limites obrigatórios: até cinco cenários, seis chamadas ao provedor por cená
 | 2026-11-03 | InProgress | Senku concluiu a arquitetura. Levi organizou o ciclo; Gohan implementa o modo opt-in. Nenhuma chamada paga foi feita. Tanjiro revisará isolamento e custo antes da execução autorizada. |
 | 2026-11-03 | InProgress | Tanjiro aprovou a revisão estática: opt-in CLI exige `--live --confirm-paid --max-cost-usd`; só o adaptador OpenAI faz rede, enquanto busca/detalhe/gravação usam fixtures e memória; guarda reserva custo estimado antes de cada chamada, sem retries; saída não imprime pedidos, respostas completas, headers ou chave; cinco cenários verificam produto, quantidade, teto, total e uma gravação simulada. Naquele momento, nenhum teste ou chamada paga havia sido executado; a avaliação live ocorreu após essa revisão. |
 | 2026-11-03 | Review | Execução autorizada com `gpt-5.4-nano`: cinco cenários passaram (5/5) em 13 chamadas, com 5.346 tokens de entrada, 456 de saída e estimativa de US$ 0,00205 incluindo margem de 25%; teto estimado máximo calculado de US$ 0,30048. O catálogo e gravador foram fixtures em memória; não houve acesso a PostgreSQL, MCP ou DummyJSON reais. README e índice atualizados. Os testes automatizados específicos do guard/configuração seguem pendentes, portanto a story fica em Review. |
+| 2026-11-03 | Review | Adicionados 14 casos focados em `backend/tests/test_evaluation_live.py`: reserva insuficiente rejeita antes da próxima chamada; corpo maior que 32 KiB não reserva chamada; usage ausente/inválido mantém reserva e encerra; modo/chave/modelo/tarifa incompatíveis e orçamento acima de US$ 0,50 falham antes de criar agente; CLI exige opt-in válido; modo padrão permanece determinístico e não importa o runner pago. Resultado: 14 passaram em container isolado `--network none`; uma warning de depreciação do Starlette/TestClient. Nenhuma chamada à API ou chave real nos testes. Status Review mantido conforme orientação; não marcado Done. |
+| 2026-11-03 | Done | Regressão corrigida por Gohan: `main_cli(None)` agora usa os argumentos CLI definidos, sem consumir argumentos do processo pytest. Validação final focada: `docker run --rm --network none projeto-me-backend-qa:local python -m pytest -q tests/test_evaluation.py tests/test_evaluation_live.py` — 17 passaram; 1 aviso de depreciação de `Starlette/TestClient`. A suíte completa do backend não foi rodada. Não houve rede, credenciais ou chamada ao provedor nessa validação. Critérios de aceite concluídos; a única execução paga autorizada permanece em 5/5, com reserva estimada de US$ 0,00205 (não é garantia da cobrança final). |

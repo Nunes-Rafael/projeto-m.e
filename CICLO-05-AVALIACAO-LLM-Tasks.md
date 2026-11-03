@@ -6,7 +6,7 @@ Medir como o modelo OpenAI configurado decide em cinco pedidos de compra sintét
 
 ## Status
 
-Review — implementação e execução live concluídas; falta cobertura automatizada específica do guard de custo/configuração.
+Done — implementação, revisão, avaliação live autorizada e validação automatizada focada concluídas.
 
 ## Definition of Ready
 
@@ -20,7 +20,7 @@ Review — implementação e execução live concluídas; falta cobertura automa
 
 | # | Trabalho | Responsável | Status | Dependências |
 |---|---|---|---|---|
-| 1 | [Avaliação opt-in do agente real](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md) — CLI, fixtures isoladas e preflight de custo | Gohan | Review | Implementação entregue; testes automatizados específicos pendentes |
+| 1 | [Avaliação opt-in do agente real](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md) — CLI, fixtures isoladas e preflight de custo | Gohan | Done | 17 testes dos dois arquivos de avaliação passaram; uma warning não bloqueante |
 | 2 | Revisar estaticamente isolamento de efeitos, proteção da chave, limites de chamadas/tokens e critérios de pontuação | Tanjiro | Done | Revisão estática aprovada sem achados bloqueantes |
 | 3 | Executar uma avaliação autorizada com `--live --confirm-paid --max-cost-usd 0.50`, usando apenas `OPENAI_MODEL` | Iroh, sob autorização já concedida | Done | 5/5; reserva estimada abaixo do teto |
 | 4 | Registrar resultado, uso/tokens e limites no README e na story | Shinobu | Done | Resultado live documentado |
@@ -33,7 +33,7 @@ Review — implementação e execução live concluídas; falta cobertura automa
 - QA revisa isolamento, não exposição de chave e saída resumida.
 - Uma única execução live autorizada termina ou falha de forma segura; uso e custo estimado são registrados sem conteúdo sensível.
 - README explica como diferenciar a avaliação determinística da execução paga opt-in.
-- A story permanece em Review até existir cobertura automatizada específica do guard de custo e configuração.
+- Story 1 está Done. Os 17 testes focados em `tests/test_evaluation.py` e `tests/test_evaluation_live.py` passaram em container sem rede; a suíte completa do backend não foi executada.
 
 ## Risco e limite
 
@@ -41,4 +41,8 @@ A estimativa usa preço conhecido do modelo configurado e margem; o valor final 
 
 ## Resultado da execução autorizada
 
-Em 2026-11-03, a execução opt-in com `gpt-5.4-nano` concluiu os cinco cenários: **5/5 PASS**, em 13 chamadas ao provedor. O uso reportado foi 5.346 tokens de entrada e 456 de saída; a estimativa com margem de 25% foi **US$ 0,00205**. O limite conservador calculado para a configuração foi US$ 0,30048 por execução. A avaliação usou catálogo e gravação em memória, sem acesso ao PostgreSQL, MCP ou DummyJSON reais. A cobrança efetiva pode divergir da estimativa. Testes automatizados específicos do guard ainda não foram criados nem executados.
+Em 2026-11-03, a execução opt-in com `gpt-5.4-nano` concluiu os cinco cenários: **5/5 PASS**, em 13 chamadas ao provedor. O uso reportado foi 5.346 tokens de entrada e 456 de saída; a estimativa com margem de 25% foi **US$ 0,00205**. O limite conservador calculado para a configuração foi US$ 0,30048 por execução. A avaliação usou catálogo e gravação em memória, sem acesso ao PostgreSQL, MCP ou DummyJSON reais. A cobrança efetiva pode divergir da estimativa.
+
+## Validação final
+
+Em 2026-11-03, os testes focados de avaliação foram executados em container isolado com `--network none`: 17 passaram entre `tests/test_evaluation.py` e `tests/test_evaluation_live.py`; ocorreu uma warning de depreciação do Starlette/TestClient. A suíte completa do backend não foi rodada. A correção de `main_cli(None)` impediu que o parser lesse argumentos externos do pytest.

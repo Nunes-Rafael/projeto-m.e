@@ -243,7 +243,7 @@ O planejamento e as evidências estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CIC
 
 ## Ciclo 05: avaliação do agente real
 
-O modo opt-in executou cinco pedidos sintéticos com o modelo `gpt-5.4-nano` e fixtures de catálogo e persistência em memória. Resultado: **5/5**, 13 chamadas, 5.346 tokens de entrada, 456 de saída e custo estimado de **US$ 0,00205**, incluindo margem de 25%. O teto da reserva estimada é US$ 0,50; a cobrança efetiva pode divergir. O modo determinístico continua sendo o único usado pela CI. A story está em Review enquanto aguardamos testes automatizados específicos do guard de custo e configuração. Consulte [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md), o [planejamento do Ciclo 05](CICLO-05-AVALIACAO-LLM-Tasks.md) e a [story](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md).
+O modo opt-in executou cinco pedidos sintéticos com o modelo `gpt-5.4-nano` e fixtures de catálogo e persistência em memória. Resultado: **5/5**, 13 chamadas, 5.346 tokens de entrada, 456 de saída e custo estimado de **US$ 0,00205**, incluindo margem de 25%. O teto da reserva estimada é US$ 0,50; a cobrança efetiva pode divergir. Os 17 testes focados do avaliador passaram. A execução emitiu um aviso de depreciação de `Starlette/TestClient`; a suíte completa do backend não foi executada. A story foi concluída. O modo determinístico continua sendo o único usado pela CI. Consulte [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md), o [planejamento do Ciclo 05](CICLO-05-AVALIACAO-LLM-Tasks.md) e a [story](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md).
 
 ## API principal
 
