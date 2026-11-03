@@ -33,7 +33,7 @@ Done — implementação, revisão, avaliação live autorizada e validação au
 - QA revisa isolamento, não exposição de chave e saída resumida.
 - Uma única execução live autorizada termina ou falha de forma segura; uso e custo estimado são registrados sem conteúdo sensível.
 - README explica como diferenciar a avaliação determinística da execução paga opt-in.
-- Story 1 está Done. Os 17 testes focados em `tests/test_evaluation.py` e `tests/test_evaluation_live.py` passaram em container sem rede; a suíte completa do backend não foi executada.
+- Story 1 está Done. Os 17 testes focados de avaliação passaram em container sem rede. Em 2026-11-02, a suíte completa do backend passou (40 testes, 1 aviso de depreciação) e a suíte MCP passou (20 testes, 3 avisos de depreciação). A CI do push `849c009` passou nos três jobs. Uma validação integrada local em Compose descartável confirmou busca, detalhe, gravação MCP e listagem persistida; nenhuma chave de LLM foi usada.
 
 ## Risco e limite
 

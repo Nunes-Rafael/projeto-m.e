@@ -57,9 +57,9 @@ Os quatro itens abaixo vieram da seção “Diferenciais (opcionais)” do PDF e
 
 O escopo entregue e os limites de validação de cada item estão detalhados em `docs/stories/ciclo-04-diferenciais/` e `docs/architecture/OPCIONAIS-ARCH.md`.
 
-#### Ciclo 5 planejado: avaliar o agente com modelo real
+#### Ciclo 5 entregue: avaliação opt-in com modelo real
 
-O case descreve os cinco pedidos como uma forma de contar quantos o agente acertou. A avaliação atual cobre cinco cenários determinísticos, mas não executa o agente com um LLM real. A extensão foi aprovada para planejamento no Ciclo 05: execução explícita e opt-in contra o modelo OpenAI configurado, com fixtures, resultados por critério e custo/uso reportado. O teto autorizado é US$ 0,50 por execução. O modo pago não fará parte da CI nem rodará automaticamente; os critérios técnicos e limites estão em `docs/architecture/AVALIACAO-LLM-ARCH.md` e na story do Ciclo 05.
+A avaliação determinística continua disponível para execução repetível e sem custo. Também foi entregue uma execução explícita e opt-in do agente com o modelo OpenAI configurado, usando cinco pedidos sintéticos e fixtures de catálogo e persistência em memória. A execução autorizada passou em 5/5 cenários, reportou uso e estimativa de custo, e não acessou PostgreSQL, MCP ou DummyJSON. O limite de reserva aprovado é US$ 0,50 por execução; a estimativa do programa não garante o valor efetivamente cobrado pelo provedor. O modo live não roda automaticamente nem faz parte da CI. Arquitetura, critérios, implementação e evidências estão em `docs/architecture/AVALIACAO-LLM-ARCH.md` e `docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md`.
 
 ### Restrições já confirmadas
 
@@ -150,7 +150,7 @@ O MVP será considerado pronto para o case quando:
 - Catálogo próprio, sincronização de estoque ou garantia de disponibilidade comercial.
 - Histórico conversacional, memória de usuário, streaming de respostas ou interface avançada.
 - Execução do adaptador OpenRouter no desenvolvimento local padrão.
-- Avaliação automática da qualidade do LLM real; a extensão opt-in ainda precisa de decisão de provedor, orçamento e critérios.
+- Execução contínua da avaliação live do LLM; ela permanece opt-in, usa fixtures isoladas e não representa validação do agente contra o banco, MCP ou catálogo real.
 
 ## 8. Riscos de produto e princípios de decisão
 

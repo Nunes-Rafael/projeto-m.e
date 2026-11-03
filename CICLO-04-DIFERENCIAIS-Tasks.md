@@ -2,7 +2,7 @@
 
 ## Status do ciclo
 
-As quatro stories estão Done para o escopo da demonstração. A CI do GitHub passou no commit `9731db0` (jobs Python, frontend e configuration).
+As quatro stories estão Done para o escopo da demonstração. A CI do GitHub passou nos commits `9731db0` e `849c009` (jobs Python, frontend e configuration).
 
 ## Objetivo do ciclo
 
@@ -17,11 +17,11 @@ Acrescentar evidências de transparência, avaliação reproduzível e qualidade
 
 ## Ordem e gates
 
-As quatro stories estão Done para o escopo acordado. S2 usa fixtures determinísticas que não medem seleção real do agente. S4 foi aprovada para a demonstração local após testes isolados de autenticação, persistência, rollback, idempotência, grants e sanitização; a captura de logs cobriu nível INFO, não DEBUG do SDK MCP. O risco residual do role de escrita está documentado e o aceite não autoriza uso em produção. A CI remota passou nos três jobs no commit `9731db0`.
+As quatro stories estão Done para o escopo acordado. S2 usa fixtures determinísticas que não medem seleção real do agente; essa lacuna foi complementada pela Story do Ciclo 05. S4 foi aprovada para a demonstração local após testes isolados de autenticação, persistência, rollback, idempotência, grants e sanitização; a captura de logs cobriu nível INFO, não DEBUG do SDK MCP. O risco residual do role de escrita está documentado e o aceite não autoriza uso em produção. A CI remota passou nos três jobs nos commits `9731db0` e `849c009`.
 
-## Lacuna identificada ao conferir o PDF
+## Extensão entregue no Ciclo 05
 
-O PDF descreve a avaliação como uma contagem de acertos do agente em cinco pedidos. A Story 2 entregue usa fixtures e mede regras determinísticas, sem chamar um LLM real. Isso mantém custo zero e repetibilidade, mas não comprova a qualidade do agente real. Extensão aprovada para planejamento no Ciclo 05: execução explícita e opt-in contra o modelo OpenAI configurado, com cinco pedidos, fixtures, critérios objetivos, custo/uso apresentado e sem execução na CI. Rafael autorizou teto de US$ 0,50 por execução. A arquitetura e a story estão em [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md) e [`01-avaliacao-agente-real.story.md`](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md); a implementação e a execução real permanecem pendentes.
+A Story 2 continua oferecendo avaliação determinística com fixtures, sem custo e com resultado reproduzível. A lacuna de não executar o agente real foi atendida no Ciclo 05: uma avaliação opt-in usou o modelo configurado, cinco pedidos sintéticos, catálogo e persistência em memória e critérios objetivos. A execução autorizada passou em 5/5 cenários e reportou uso e custo estimado, sem acessar PostgreSQL, MCP ou DummyJSON. O teto de US$ 0,50 limita a reserva estimada pelo programa, não garante a cobrança final do provedor. Consulte [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md) e [`01-avaliacao-agente-real.story.md`](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md).
 
 ## Gate de saída
 
