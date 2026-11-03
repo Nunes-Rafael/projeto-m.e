@@ -236,7 +236,7 @@ O planejamento e as evidências estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CIC
 |---|---|---|
 | 1. Ferramentas no chat | Done | Exibe somente os nomes das tools executadas naquela requisição e limpa o estado entre envios. |
 | 2. Avaliação com cinco pedidos | Done | CLI determinístico com relatório `N/5`, fixtures isoladas e código de saída verificável. |
-| 3. CI de lint e testes | Review | Workflow e comandos locais disponíveis; execução no GitHub ainda não verificada. |
+| 3. CI de lint e testes | Done | Workflow executado no GitHub para o commit de entrega; jobs Python, frontend e configuration concluíram com sucesso. |
 | 4. Tool `criar_requisicao` | Done para demonstração local | MCP writer autenticado, idempotência e roles separadas; risco residual documentado. Testes de logs cobrem INFO, não DEBUG do SDK MCP. |
 
 ## API principal

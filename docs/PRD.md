@@ -46,6 +46,21 @@ Se o catálogo não oferecer uma alternativa compatível, a pessoa recebe uma ex
 8. Permitir que o ambiente completo seja iniciado localmente com um único comando de composição de containers e que as tabelas necessárias sejam criadas automaticamente.
 9. Documentar como executar o projeto e as principais decisões de produto e implementação.
 
+### Diferenciais opcionais do case
+
+Os quatro itens abaixo vieram da seção “Diferenciais (opcionais)” do PDF e foram planejados no Ciclo 04:
+
+1. **Ferramentas no chat:** mostrar os nomes das ferramentas MCP executadas na requisição atual, sem expor argumentos, conteúdo ou credenciais.
+2. **Avaliação com cinco pedidos:** executar cinco cenários controlados, mostrar o resultado de cada um e apresentar o total `N/5`. A implementação atual usa fixtures determinísticas para verificar regras de negócio; não mede a qualidade da seleção do LLM real.
+3. **CI de lint e testes:** executar lint, build e testes no GitHub Actions em push e pull request, sem chave de provedor nem chamadas pagas.
+4. **Criação por ferramenta MCP:** disponibilizar `criar_requisicao` para o agente solicitar a gravação, com validação no backend e persistência autenticada, atômica e idempotente no servidor MCP.
+
+O escopo entregue e os limites de validação de cada item estão detalhados em `docs/stories/ciclo-04-diferenciais/` e `docs/architecture/OPCIONAIS-ARCH.md`.
+
+#### Extensão proposta: avaliar o agente com modelo real
+
+O case descreve os cinco pedidos como uma forma de contar quantos o agente acertou. A avaliação atual cobre cinco cenários determinísticos, mas não executa o agente com um LLM real. Uma extensão futura pode oferecer uma execução explícita e opt-in contra um provedor configurado, com resultados por critério e custo/uso reportado. Essa execução não deve fazer parte da CI nem rodar automaticamente; depende de decisão sobre provedor, orçamento e tratamento da chave. Até essa extensão ser aprovada e planejada em uma story própria, a avaliação determinística permanece a evidência reproduzível disponível.
+
 ### Restrições já confirmadas
 
 - O teto informado no pedido é interpretado como teto por unidade. Portanto, no exemplo, cada laptop selecionado deve custar no máximo US$ 2.000.
@@ -134,8 +149,8 @@ O MVP será considerado pronto para o case quando:
 - Integração com ERP, pagamento, e-mail, estoque ou fornecedores reais.
 - Catálogo próprio, sincronização de estoque ou garantia de disponibilidade comercial.
 - Histórico conversacional, memória de usuário, streaming de respostas ou interface avançada.
-- Terceira ferramenta para persistir requisições via MCP; trata-se de melhoria opcional para depois do fluxo obrigatório.
 - Execução do adaptador OpenRouter no desenvolvimento local padrão.
+- Avaliação automática da qualidade do LLM real; a extensão opt-in ainda precisa de decisão de provedor, orçamento e critérios.
 
 ## 8. Riscos de produto e princípios de decisão
 

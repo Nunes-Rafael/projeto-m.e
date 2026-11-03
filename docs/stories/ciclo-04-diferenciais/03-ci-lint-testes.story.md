@@ -2,7 +2,7 @@
 
 ## Status
 
-Review — workflow criado e comandos verificados localmente; execução no GitHub ainda não verificada.
+Done — workflow executado no GitHub com sucesso no commit de entrega.
 
 ## Módulo
 
@@ -47,4 +47,5 @@ Adicionar GitHub Actions para lint/build do frontend, testes Python do backend e
 | 2026-11-02 | Review | Workflow criado para frontend, Python com Postgres de teste e Compose. Localmente: lint, 4 testes e build do frontend; 26 testes backend; 20 testes MCP; avaliação 5/5; Compose config válido. Execução no GitHub e revisão final pendentes. |
 | 2026-11-02 | Review | Retomada por Itachi: ações fixadas por SHA verificado no repositório oficial, Node `22.20.0`, Python `3.12.12`, Ubuntu `24.04` e imagem PostgreSQL por digest. `actionlint 1.7.7` passou. Frontend: lint exit 0 com 8 warnings conhecidos de configuração Biome/CSS, 4/4 testes e build passaram. Backend: 26/26 testes; MCP: 20/20, incluindo sanitização ampliada; avaliação: 5/5. PostgreSQL `purchase_test` exclusivo em container descartável, sem porta ou volume, e rede interna removidos após a execução. Nenhum acesso ao banco da demonstração ou API externa. |
 | 2026-11-02 | Review | Scanner local `python scripts/check_secrets.py` verifica nomes de arquivos sensíveis e padrões conhecidos de credenciais, informando somente caminho e linha. Scan do repositório passou; uma credencial sintética foi detectada com exit 1 sem ecoar seu valor. Compose validado com placeholders e sem carregar `.env`. Workflow não foi executado no GitHub; revisão final e atualização documental permanecem como gate. |
-| 2026-11-02 | Review | README atualizado com workflow, comandos e limites da CI. `actionlint 1.7.7`, frontend, backend, MCP, avaliação, scanner e Compose passaram localmente; lint frontend emitiu 8 warnings não bloqueantes de configuração Biome/CSS. A execução remota no GitHub não foi feita; Story permanece Review até essa evidência externa. |
+| 2026-11-02 | Review | README atualizado com workflow, comandos e limites da CI. `actionlint 1.7.7`, frontend, backend, MCP, avaliação, scanner e Compose passaram localmente; lint frontend emitiu 8 warnings não bloqueantes de configuração Biome/CSS. A execução remota no GitHub ainda não havia sido feita. |
+| 2026-11-03 | Done | CI executada no GitHub para o commit `9731db01f1afc44c759b61eb643a586c83932069`; jobs Python, frontend e configuration concluíram com sucesso. |
