@@ -181,6 +181,7 @@ O servidor MCP é acessível ao backend pela rede privada do Compose e exige tok
 | `docs/architecture/STACK.md` | Tecnologias, topologia local, configuração e trade-offs. |
 | `docs/architecture/AGENTE-COMPRAS-ARCH.md` | Entidades, contrato HTTP/MCP, ciclo do agente, validações e falhas. |
 | `docs/architecture/OPCIONAIS-ARCH.md` | Contratos do Ciclo 04, MCP writer, idempotência, limites e risco residual da demonstração. |
+| `docs/architecture/AVALIACAO-LLM-ARCH.md` | Arquitetura planejada para avaliação manual opt-in com LLM, fixtures e teto de custo. |
 | `docs/designs/DESIGN.md` | Direção visual, tokens, layout, estados, responsividade e acessibilidade. |
 
 ### Planejamento SDD e histórico de entrega
@@ -191,6 +192,7 @@ O servidor MCP é acessível ao backend pela rede privada do Compose e exige tok
 | `CICLO-02-BACKEND-AGENTE-Tasks.md` | Índice do ciclo de persistência, agente e API. |
 | `CICLO-03-ENTREGA-Tasks.md` | Índice do ciclo de interface, README, testes e revisão final. |
 | `CICLO-04-DIFERENCIAIS-Tasks.md` | Planejamento dos opcionais: telemetria de tools no chat, script de avaliação, CI e tool de gravação MCP. |
+| `docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md` | Story planejada para medir cinco decisões do agente real, sem escrita no banco demonstrativo. |
 | `docs/stories/ciclo-01-fundacao-mcp/` | Stories e logs de execução da fundação e do servidor MCP. |
 | `docs/stories/ciclo-02-backend-agente/` | Stories e logs de execução do banco, agente e API. |
 | `docs/stories/ciclo-03-entrega/` | Stories e logs de execução da interface e preparação da entrega. |
@@ -238,6 +240,10 @@ O planejamento e as evidências estão em [`CICLO-04-DIFERENCIAIS-Tasks.md`](CIC
 | 2. Avaliação com cinco pedidos | Done | CLI determinístico com relatório `N/5`, fixtures isoladas e código de saída verificável. |
 | 3. CI de lint e testes | Done | Workflow executado no GitHub para o commit de entrega; jobs Python, frontend e configuration concluíram com sucesso. |
 | 4. Tool `criar_requisicao` | Done para demonstração local | MCP writer autenticado, idempotência e roles separadas; risco residual documentado. Testes de logs cobrem INFO, não DEBUG do SDK MCP. |
+
+## Ciclo 05 planejado: avaliação do agente real
+
+A extensão aprovada executará cinco pedidos sintéticos com o modelo OpenAI configurado no `.env`, usando catálogo e persistência em memória. O teto aprovado é US$ 0,50 por execução. A implementação e a execução ainda estão pendentes; os limites estão descritos em [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md) e na [story](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md). O modo determinístico continua sendo o único usado pela CI.
 
 ## API principal
 

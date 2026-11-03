@@ -21,7 +21,7 @@ As quatro stories estão Done para o escopo acordado. S2 usa fixtures determiní
 
 ## Lacuna identificada ao conferir o PDF
 
-O PDF descreve a avaliação como uma contagem de acertos do agente em cinco pedidos. A Story 2 entregue usa fixtures e mede regras determinísticas, sem chamar um LLM real. Isso mantém custo zero e repetibilidade, mas não comprova a qualidade do agente real. Extensão proposta para planejamento futuro: uma execução explícita e opt-in contra o provedor escolhido, com cinco pedidos, critérios objetivos, custo/uso apresentado e sem execução na CI. A decisão depende de provedor, orçamento e critérios de avaliação; não está incluída no aceite concluído do Ciclo 04.
+O PDF descreve a avaliação como uma contagem de acertos do agente em cinco pedidos. A Story 2 entregue usa fixtures e mede regras determinísticas, sem chamar um LLM real. Isso mantém custo zero e repetibilidade, mas não comprova a qualidade do agente real. Extensão aprovada para planejamento no Ciclo 05: execução explícita e opt-in contra o modelo OpenAI configurado, com cinco pedidos, fixtures, critérios objetivos, custo/uso apresentado e sem execução na CI. Rafael autorizou teto de US$ 0,50 por execução. A arquitetura e a story estão em [`AVALIACAO-LLM-ARCH.md`](docs/architecture/AVALIACAO-LLM-ARCH.md) e [`01-avaliacao-agente-real.story.md`](docs/stories/ciclo-05-avaliacao-llm/01-avaliacao-agente-real.story.md); a implementação e a execução real permanecem pendentes.
 
 ## Gate de saída
 

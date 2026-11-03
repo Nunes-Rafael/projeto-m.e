@@ -57,9 +57,9 @@ Os quatro itens abaixo vieram da seção “Diferenciais (opcionais)” do PDF e
 
 O escopo entregue e os limites de validação de cada item estão detalhados em `docs/stories/ciclo-04-diferenciais/` e `docs/architecture/OPCIONAIS-ARCH.md`.
 
-#### Extensão proposta: avaliar o agente com modelo real
+#### Ciclo 5 planejado: avaliar o agente com modelo real
 
-O case descreve os cinco pedidos como uma forma de contar quantos o agente acertou. A avaliação atual cobre cinco cenários determinísticos, mas não executa o agente com um LLM real. Uma extensão futura pode oferecer uma execução explícita e opt-in contra um provedor configurado, com resultados por critério e custo/uso reportado. Essa execução não deve fazer parte da CI nem rodar automaticamente; depende de decisão sobre provedor, orçamento e tratamento da chave. Até essa extensão ser aprovada e planejada em uma story própria, a avaliação determinística permanece a evidência reproduzível disponível.
+O case descreve os cinco pedidos como uma forma de contar quantos o agente acertou. A avaliação atual cobre cinco cenários determinísticos, mas não executa o agente com um LLM real. A extensão foi aprovada para planejamento no Ciclo 05: execução explícita e opt-in contra o modelo OpenAI configurado, com fixtures, resultados por critério e custo/uso reportado. O teto autorizado é US$ 0,50 por execução. O modo pago não fará parte da CI nem rodará automaticamente; os critérios técnicos e limites estão em `docs/architecture/AVALIACAO-LLM-ARCH.md` e na story do Ciclo 05.
 
 ### Restrições já confirmadas
 
