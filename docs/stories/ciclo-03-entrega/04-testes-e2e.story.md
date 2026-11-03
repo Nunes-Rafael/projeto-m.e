@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved
+Review — integração entre serviços validada; interação automatizada no navegador e retry ainda pendentes.
 
 ## Módulo
 
@@ -41,6 +41,7 @@ Criar testes de ponta a ponta ou de fronteira equivalente para sucesso, erro de 
 | Data | Status | Nota |
 |---|---|---|
 | 2026-10-31 | Review | `docker compose up --build -d` subiu os quatro serviços; Vite serviu a página e `npm run build` passou. Backend e MCP passaram cada um 6 testes, sem chave de LLM. Não há runner de browser instalado, então não foi possível automatizar a interação real no navegador. Revisão visual do fluxo encontrou um desvio do aceite: erro temporário oferece “Editar pedido”, mas ainda não oferece a ação “Tentar novamente”. |
+| 2026-11-02 | Review | Fluxo de serviços em Compose descartável validado: página do frontend servida, backend acessado, catálogo consultado, tools MCP executadas e requisição persistida/listada no PostgreSQL exclusivo. O teste passou pela API do backend; o proxy HTTP temporário do Vite não foi concluído e não houve interação automatizada em navegador. Retry de erro temporário também continua pendente. |
 
 ## Evidências e pendências
 
