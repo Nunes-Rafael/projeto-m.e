@@ -50,17 +50,30 @@ class PurchaseAgent(Protocol):
     async def decide(self, pedido: str, catalog: CatalogMcpClient) -> AgentDecision: ...
 
 
-def get_purchase_agent() -> PurchaseAgent:
+class ProviderRequestGuard(Protocol):
+    def before_request(self, payload: dict[str, Any]) -> None: ...
+    def record_usage(self, usage: Any) -> None: ...
+
+
+def get_purchase_agent(
+    request_guard: ProviderRequestGuard | None = None,
+    max_completion_tokens: int | None = None,
+) -> PurchaseAgent:
     mode = os.getenv("AGENT_MODE", "local").lower()
     if mode == "local":
         return LocalPurchaseAgent()
     if mode == "openrouter":
-        return OpenRouterPurchaseAgent.from_environment()
+        return OpenRouterPurchaseAgent.from_environment(
+            request_guard=request_guard,
+            max_completion_tokens=max_completion_tokens,
+        )
     if mode == "openai":
         return OpenRouterPurchaseAgent.from_environment(
             api_key_name="OPENAI_API_KEY",
             model_name="OPENAI_MODEL",
             api_url=OPENAI_URL,
+            request_guard=request_guard,
+            max_completion_tokens=max_completion_tokens,
         )
     raise AgentConfigurationError("Modo de agente inválido")
 
@@ -86,10 +99,19 @@ class LocalPurchaseAgent:
 
 
 class OpenRouterPurchaseAgent:
-    def __init__(self, api_key: str, model: str, api_url: str = OPENROUTER_URL) -> None:
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        api_url: str = OPENROUTER_URL,
+        request_guard: ProviderRequestGuard | None = None,
+        max_completion_tokens: int | None = None,
+    ) -> None:
         self.api_key = api_key
         self.model = model
         self.api_url = api_url
+        self.request_guard = request_guard
+        self.max_completion_tokens = max_completion_tokens
 
     @classmethod
     def from_environment(
@@ -97,12 +119,14 @@ class OpenRouterPurchaseAgent:
         api_key_name: str = "OPENROUTER_API_KEY",
         model_name: str = "OPENROUTER_MODEL",
         api_url: str = OPENROUTER_URL,
+        request_guard: ProviderRequestGuard | None = None,
+        max_completion_tokens: int | None = None,
     ) -> "OpenRouterPurchaseAgent":
         api_key = os.getenv(api_key_name, "").strip()
         model = os.getenv(model_name, "").strip()
         if not api_key or not model:
             raise AgentConfigurationError(f"O modo configurado exige {api_key_name} e {model_name}")
-        return cls(api_key, model, api_url)
+        return cls(api_key, model, api_url, request_guard, max_completion_tokens)
 
     async def decide(self, pedido: str, catalog: CatalogMcpClient) -> AgentDecision:
         messages: list[dict[str, Any]] = [
@@ -120,13 +144,25 @@ class OpenRouterPurchaseAgent:
         async with httpx.AsyncClient(timeout=15) as client:
             for _ in range(MAX_TOOL_CALLS):
                 try:
+                    request_payload = {
+                        "model": self.model,
+                        "messages": messages,
+                        "tools": _tool_schemas(bool(getattr(catalog, "searched_product_ids", set()))),
+                    }
+                    if self.max_completion_tokens is not None:
+                        request_payload["max_completion_tokens"] = self.max_completion_tokens
+                    if self.request_guard is not None:
+                        self.request_guard.before_request(request_payload)
                     response = await client.post(
                         self.api_url,
                         headers={"Authorization": f"Bearer {self.api_key}"},
-                        json={"model": self.model, "messages": messages, "tools": _tool_schemas(bool(getattr(catalog, "searched_product_ids", set())))},
+                        json=request_payload,
                     )
                     response.raise_for_status()
-                    message = response.json()["choices"][0]["message"]
+                    provider_response = response.json()
+                    if self.request_guard is not None:
+                        self.request_guard.record_usage(provider_response.get("usage"))
+                    message = provider_response["choices"][0]["message"]
                 except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as error:
                     reason = "provider_unavailable"
                     if isinstance(error, httpx.HTTPStatusError):

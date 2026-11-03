@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
@@ -196,7 +197,26 @@ def run_scenario(scenario: Scenario) -> tuple[bool, str]:
             os.environ["MCP_SERVER_URL"] = original_mcp_url
 
 
-def main_cli() -> int:
+def main_cli(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Avalia o agente de compras com fixtures determinísticas.")
+    parser.add_argument("--live", action="store_true", help="Executa os cinco cenários com o LLM configurado; pode gerar custo.")
+    parser.add_argument("--confirm-paid", action="store_true", help="Confirma explicitamente chamadas pagas; obrigatório com --live.")
+    parser.add_argument("--max-cost-usd", type=Decimal, help="Teto de custo para --live, limitado a US$ 0,50.")
+    args = parser.parse_args(argv)
+    if args.live:
+        if not args.confirm_paid:
+            parser.error("--live exige --confirm-paid")
+        if args.max_cost_usd is None:
+            parser.error("--live exige --max-cost-usd até 0.50")
+        if not args.max_cost_usd.is_finite() or args.max_cost_usd <= 0 or args.max_cost_usd > Decimal("0.50"):
+            parser.error("--max-cost-usd deve ser maior que zero e não passar de 0.50")
+        from evaluation.live import run_live_evaluation
+
+        return run_live_evaluation(args.max_cost_usd)
+    if args.confirm_paid:
+        parser.error("--confirm-paid só pode ser usado com --live")
+    if args.max_cost_usd is not None:
+        parser.error("--max-cost-usd só pode ser usado com --live")
     passed = 0
     for scenario in SCENARIOS:
         ok, reason = run_scenario(scenario)
@@ -208,4 +228,4 @@ def main_cli() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main_cli())
+    sys.exit(main_cli(sys.argv[1:]))
