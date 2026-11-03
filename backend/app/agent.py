@@ -292,6 +292,6 @@ def _extract_term(pedido: str) -> str:
     normalized = pedido.lower()
     for term in ("laptop", "notebook", "phone", "smartphone", "monitor"):
         if term in normalized:
-            return term
+            return "laptop" if term == "notebook" else term
     words = re.findall(r"[a-zA-ZÀ-ÿ]{2,}", normalized)
     return words[-1] if words else "produto"
