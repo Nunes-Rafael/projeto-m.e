@@ -33,7 +33,7 @@ Done — implementação, revisão, avaliação live autorizada e validação au
 - QA revisa isolamento, não exposição de chave e saída resumida.
 - Uma única execução live autorizada termina ou falha de forma segura; uso e custo estimado são registrados sem conteúdo sensível.
 - README explica como diferenciar a avaliação determinística da execução paga opt-in.
-- Story 1 está Done. Os 17 testes focados de avaliação passaram em container sem rede. Em 2026-11-02, a suíte completa do backend passou (40 testes, 1 aviso de depreciação) e a suíte MCP passou (20 testes, 3 avisos de depreciação). A CI do push `849c009` passou nos três jobs. Uma validação de integração de serviços em Compose descartável confirmou busca, detalhe, gravação MCP e listagem persistida; nenhuma chave de LLM foi usada. A interação completa no navegador continua pendente na Story 4 do Ciclo 03.
+- Story 1 está Done. Os 17 testes focados de avaliação passaram em container sem rede. Em 2026-11-02, a suíte completa do backend passou (42 testes, 1 aviso de depreciação) e a suíte MCP passou (20 testes, 3 avisos de depreciação). A CI do push `849c009` passou nos três jobs. A integração de serviços em Compose descartável confirmou busca, detalhe, gravação MCP e listagem persistida. Depois, Rafael validou manualmente no navegador o modo OpenAI e o PostgreSQL confirmou o pedido `#0002`; automação de browser e fluxos de erro/retry continuam pendentes na Story 4 do Ciclo 03.
 
 ## Risco e limite
 
